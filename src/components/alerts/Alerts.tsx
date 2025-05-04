@@ -1,17 +1,10 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { mockAlerts } from '../../data/mockData';
+import { Alert } from '../../types';
 
-interface Alert {
-  id: string;
-  title: string;
-  message: string;
-  type: string;
-  is_read: boolean;
-  device_id: string | null;
-  created_at: string;
-  updated_at: string;
-}
+
 
 function Alerts() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -19,6 +12,10 @@ function Alerts() {
 
   useEffect(() => {
     fetchAlerts();
+    setTimeout(() => {
+      setAlerts(mockAlerts);
+      setLoading(false);
+    }, 500);
   }, []);
 
   async function fetchAlerts() {
@@ -40,15 +37,15 @@ function Alerts() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div className="w-8 h-8 border-b-2 border-gray-900 rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Alerts</h1>
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="container px-4 py-8 mx-auto">
+      <h1 className="mb-6 text-2xl font-bold">Alerts</h1>
+      <div className="overflow-hidden bg-white rounded-lg shadow">
         {alerts.length === 0 ? (
           <div className="p-4 text-center text-gray-500">
             No alerts found
@@ -56,12 +53,12 @@ function Alerts() {
         ) : (
           <ul className="divide-y divide-gray-200">
             {alerts.map((alert) => (
-              <li key={alert.id} className={`p-4 ${!alert.is_read ? 'bg-blue-50' : ''}`}>
+              <li key={alert.id} className={`p-4 ${!alert.isRead ? 'bg-blue-50' : ''}`}>
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">{alert.title}</h3>
                     <p className="mt-1 text-gray-600">{alert.message}</p>
-                    <div className="mt-2 flex items-center space-x-4">
+                    <div className="flex items-center mt-2 space-x-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         alert.type === 'error' ? 'bg-red-100 text-red-800' :
                         alert.type === 'warning' ? 'bg-yellow-100 text-yellow-800' :
@@ -70,7 +67,7 @@ function Alerts() {
                         {alert.type}
                       </span>
                       <span className="text-sm text-gray-500">
-                        {new Date(alert.created_at).toLocaleString()}
+                        {new Date(alert.timestamp).toLocaleString()}
                       </span>
                     </div>
                   </div>
